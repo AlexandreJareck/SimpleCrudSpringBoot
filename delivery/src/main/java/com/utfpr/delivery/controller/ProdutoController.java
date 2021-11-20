@@ -33,14 +33,14 @@ public class ProdutoController {
 
 	@GetMapping
 	@ResponseBody
-	public List<ProdutoResumoDTO> obterRestaurantes() {
+	public List<ProdutoResumoDTO> obterProdutos() {
 
 		return produtoResumoOutputMapper.mapearLista(produtoService.listar());
 	}
 
 	@GetMapping("/{id}")
 	@ResponseBody
-	public Produto obterRestaurantePorId(@PathVariable Long id) {
+	public Produto obterProdutoPorId(@PathVariable Long id) {
 
 		return produtoService.obterProdutoPorId(id);
 	}
