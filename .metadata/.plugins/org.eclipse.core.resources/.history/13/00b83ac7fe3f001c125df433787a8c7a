@@ -1,0 +1,31 @@
+package com.utfpr.delivery.mapper;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
+import com.utfpr.delivery.dto.RestauranteResumoDTO;
+import com.utfpr.delivery.entity.Restaurante;
+
+@Component
+public class RestauranteResumoOutputMapper {
+	
+	public RestauranteResumoDTO mapearDTO(Restaurante restaurante) {
+		
+		RestauranteResumoDTO restauranteResumoDTO = new RestauranteResumoDTO();
+		
+		restauranteResumoDTO.setId(restaurante.getId());
+		restauranteResumoDTO.setNome(restaurante.getNome());
+		
+		return restauranteResumoDTO;		
+	}
+	
+	public List<RestauranteResumoDTO> mapearLista(List<Restaurante> restaurantes) {
+		
+		return restaurantes.stream()
+				.map(restaurante -> mapearDTO(restaurante))
+				.collect(Collectors.toList());
+	}
+	
+}

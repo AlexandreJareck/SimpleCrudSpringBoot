@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;com.utfpr.delivery.config.ModelMapper&apos; to &apos;ModelMapperConfig&apos;&#x0D;&#x0A;- Original project: &apos;delivery&apos;&#x0D;&#x0A;- Original element: &apos;com.utfpr.delivery.config.ModelMapper&apos;&#x0D;&#x0A;- Renamed element: &apos;com.utfpr.delivery.config.ModelMapperConfig&apos;&#x0D;&#x0A;- Update references to refactored element&#x0D;&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;ModelMapper&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.utfpr.delivery.config{ModelMapper.java[ModelMapper" matchStrategy="1" name="ModelMapperConfig" qualified="false" references="true" similarDeclarations="false" stamp="1636311473169" textual="false" version="1.0"/>
+</session>

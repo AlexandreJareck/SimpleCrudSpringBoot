@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.utfpr.delivery.dto.RestauranteDTO;
 import com.utfpr.delivery.dto.RestauranteResumoDTO;
 import com.utfpr.delivery.entity.Restaurante;
 
@@ -17,7 +18,6 @@ public class RestauranteResumoOutputMapper {
 	private ModelMapper modelMapper;
 
 	public RestauranteResumoDTO mapearDTO(Restaurante restaurante) {
-
 		RestauranteResumoDTO restauranteResumoDTO = modelMapper.map(restaurante, RestauranteResumoDTO.class);
 		
 		return restauranteResumoDTO;

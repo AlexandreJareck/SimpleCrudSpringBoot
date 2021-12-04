@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.utfpr.delivery.dto.RestauranteDTO;
+import com.utfpr.delivery.dto.RestauranteInputDTO;
 import com.utfpr.delivery.dto.RestauranteResumoDTO;
 import com.utfpr.delivery.entity.Restaurante;
+import com.utfpr.delivery.mapper.RestauranteInputMapper;
+import com.utfpr.delivery.mapper.RestauranteOutputMapper;
 import com.utfpr.delivery.mapper.RestauranteResumoOutputMapper;
 import com.utfpr.delivery.service.RestauranteService;
 
@@ -37,6 +42,12 @@ public class RestauranteController {
 	
 	@Autowired
 	private RestauranteResumoOutputMapper restauranteResumoOutputMapper;
+	
+	@Autowired
+	private RestauranteInputMapper restauranteInputMapper;
+	
+	@Autowired
+	private RestauranteOutputMapper restauranteOutputMapper;	
 
 	@GetMapping
 	@ResponseBody
@@ -45,39 +56,57 @@ public class RestauranteController {
 		return restauranteResumoOutputMapper.mapearLista(restauranteService.listar());		 
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping("/{uuid}")
 	@ResponseBody
-	public Restaurante obterRestaurantePorId(@PathVariable Long id) {
+	public RestauranteDTO obterRestaurantePorId(@PathVariable String uuid) {
 
-		return restauranteService.obterRestaurantePorId(id);
+		Restaurante restaurante = restauranteService.obterRestaurantePorUuid(uuid);
+		
+		RestauranteDTO restauranteDTO = restauranteOutputMapper.mapearDTO(restaurante);
+		
+		return restauranteDTO;
 	}
 
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	private Restaurante adicionar(@RequestBody Restaurante restaurante) {
-
-		return restauranteService.salvar(restaurante);
+	private RestauranteDTO adicionar(@RequestBody @Valid RestauranteInputDTO restauranteInputDTO) {
+		
+		Restaurante restaurante = restauranteInputMapper.mapearEntity(restauranteInputDTO);
+		
+		restaurante = restauranteService.salvar(restaurante);
+		
+		RestauranteDTO restauranteDTO = restauranteOutputMapper.mapearDTO(restaurante);
+		
+		return restauranteDTO;
 
 	}
 
-	@PutMapping("/{id}")
+	@PutMapping("/{uuid}")
 	@ResponseStatus(code = HttpStatus.OK)
-	private Restaurante alterar(@PathVariable Long id, @RequestBody Restaurante restaurante) {
+	private RestauranteDTO alterar(@PathVariable String uuid, @RequestBody Restaurante restaurante) {
 
-		return restauranteService.alterar(id, restaurante);
+		restaurante = restauranteService.alterar(uuid, restaurante);
+		
+		RestauranteDTO restauranteDTO = restauranteOutputMapper.mapearDTO(restaurante);
+		
+		return restauranteDTO;
 	}
 	
 	@PatchMapping("/{id}")
 	@ResponseStatus(code = HttpStatus.OK)
-	public @ResponseBody Restaurante alterarParcial(@PathVariable Long id, HttpServletRequest request) throws IOException
-	{
-		return restauranteService.alterarParcial(id, request);	    
+	public @ResponseBody RestauranteDTO alterarParcial(@PathVariable String uuid, HttpServletRequest request) throws IOException
+	{		
+		Restaurante restaurante = restauranteService.alterarParcial(uuid, request);	
+		
+		RestauranteDTO restauranteDTO = restauranteOutputMapper.mapearDTO(restaurante);
+		
+		return restauranteDTO;
 	}
 
 	@DeleteMapping("/{id}")
-	private ResponseEntity deletar(@PathVariable Long id) {
+	private ResponseEntity deletar(@PathVariable String uuid) {
 
-		if (restauranteService.deletar(id)) {
+		if (restauranteService.deletar(uuid)) {
 			return ResponseEntity.noContent().build();
 		}
 
