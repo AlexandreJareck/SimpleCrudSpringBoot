@@ -1,0 +1,74 @@
+package com.utfpr.delivery.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.utfpr.delivery.dto.ProdutoResumoDTO;
+import com.utfpr.delivery.entity.Cliente;
+import com.utfpr.delivery.entity.Produto;
+import com.utfpr.delivery.mapper.ProdutoResumoOutputMapper;
+import com.utfpr.delivery.service.ClienteService;
+import com.utfpr.delivery.service.ProdutoService;
+
+@RestController
+@RequestMapping("/produtos")
+public class ClienteController {
+
+	@Autowired
+	private ClienteService clienteService;
+
+	@Autowired
+	private ProdutoResumoOutputMapper produtoResumoOutputMapper;
+
+	@GetMapping
+	@ResponseBody
+	public List<ProdutoResumoDTO> obterProdutos() {
+
+		return produtoResumoOutputMapper.mapearLista(clienteService.listar());
+	}
+
+	@GetMapping("/{id}")
+	@ResponseBody
+	public Cliente obterProdutoPorId(@PathVariable Long id) {
+
+		return clienteService.obterClientePorId(id);
+	}
+
+	@PostMapping
+	@ResponseStatus(code = HttpStatus.CREATED)
+	private Cliente adicionar(@RequestBody Produto produto) {
+		
+		return clienteService.salvar(produto);
+
+	}
+
+	@PutMapping("/{id}")
+	@ResponseStatus(code = HttpStatus.OK)
+	private Cliente alterar(@PathVariable Long id, @RequestBody Cliente produto) {
+
+		return clienteService.alterar(id, produto);
+	}
+
+	@DeleteMapping("/{id}")
+	private ResponseEntity deletar(@PathVariable Long id) {
+
+		if (clienteService.deletar(id)) {
+			return ResponseEntity.noContent().build();
+		}
+
+		return ResponseEntity.badRequest().build();
+	}
+}

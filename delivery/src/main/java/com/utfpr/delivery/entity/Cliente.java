@@ -32,8 +32,7 @@ public class Cliente {
 	@Column(name = "limite_credito", nullable = false)
 	private BigDecimal limeteCredito;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "restaurante_idf")
-	private Restaurante restaurante;
+	@Column(name = "restaurante_idf")
+	private Long restaurante;
 
 }

@@ -1,0 +1,69 @@
+package com.utfpr.delivery.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.utfpr.delivery.entity.Cliente;
+import com.utfpr.delivery.entity.Produto;
+import com.utfpr.delivery.repository.ClienteRepository;
+
+@Service
+public class ClienteService {
+
+	@Autowired
+	private ClienteRepository clienteRepository;
+
+	public List<Cliente> listar() {
+		return clienteRepository.findAll();
+	}
+
+	public Cliente obterProdutoPorId(Long id) {
+		Optional<Cliente> produto = clienteRepository.findById(id);
+
+		if (produto.isPresent()) {
+			return produto.get();
+		}
+
+		return null;
+	}
+
+	public Cliente salvar(Cliente produto) {
+		return clienteRepository.save(produto);
+	}
+
+	public Cliente alterar(Long id, Cliente produto) {
+
+		Cliente produtoAtual = this.obterProdutoPorId(id);
+
+		if (produtoAtual != null) {
+			BeanUtils.copyProperties(produto, produtoAtual, "id");
+
+			return clienteRepository.save(produtoAtual);
+		}
+
+		return null;
+	}
+
+	public boolean deletar(Long id) {
+
+		Cliente produto = this.obterProdutoPorId(id);
+
+		if (produto != null) {
+
+			try {
+				clienteRepository.delete(produto);
+				return true;
+			} catch (EmptyResultDataAccessException ex) {
+				System.out.println(ex.getMessage());
+			}
+
+		}
+
+		return false;
+	}
+}
