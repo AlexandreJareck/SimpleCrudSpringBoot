@@ -1,0 +1,108 @@
+package com.utfpr.delivery.service;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.utfpr.delivery.entity.Pedido;
+import com.utfpr.delivery.exception.NotFoundException;
+import com.utfpr.delivery.mapper.pedido.PedidoDTOMapper;
+import com.utfpr.delivery.mapper.pedido.PedidoInputDTOMapper;
+import com.utfpr.delivery.mapper.pedidoItem.PedidoItemDTOMapper;
+import com.utfpr.delivery.mapper.pedidoItem.PedidoItemInputDTOMapper;
+import com.utfpr.delivery.mapper.pedidoItem.PedidoItemsDTOMapper;
+import com.utfpr.delivery.repository.PedidoRepository;
+
+@Service
+public class PedidoService {
+	
+	@Autowired
+	private RestauranteService restauranteService;
+	@Autowired
+	private ClienteService clienteService;
+	@Autowired
+	private ProdutoService produtoService;
+	@Autowired
+	private PedidoItemService pedidoItemService;
+
+	@Autowired
+	private PedidoDTOMapper pedidoOutputMapper;
+	@Autowired
+	private PedidoInputDTOMapper pedidoInputDTOMapper;
+	@Autowired
+	private PedidoItemInputDTOMapper pedidoItemInputDTOMapper;
+	@Autowired
+	private PedidoItemDTOMapper pedidoItemDTOMapper;
+	@Autowired
+	private PedidoItemsDTOMapper pedidoItemsDTOMapper;
+	
+	@Autowired
+	private PedidoRepository pedidoRepository;
+	@Autowired
+	ObjectMapper objectMapper;
+
+	public List<Pedido> listar() {
+		List<Pedido> pedidos = pedidoRepository.findAll();
+
+		return pedidoOutputMapper.mapearLista(pedidos);		
+	}
+
+	public Pedido obterPedidoPorId(Long id) {
+		Optional<Pedido> pedido = pedidoRepository.findById(id);
+
+		if (pedido.isPresent()) {
+			return pedido.get();
+		}
+
+		return null;
+	}
+
+	public Pedido obterPedidoPorUuid(String uuid) {
+		
+		Pedido pedido = pedidoRepository.findByUuid(uuid);
+		
+		if(pedido == null) {
+			throw new NotFoundException("Pedido não encontrado");
+		}
+		
+		return pedido;
+
+	}
+
+	public Pedido salvar(Pedido pedido) {			
+		
+		return pedidoRepository.save(pedido);
+	}
+
+	public Pedido alterar(String uuid, Pedido order) {
+		 
+		Pedido pedidoAtual = this.obterPedidoPorUuid(uuid);
+ 
+		BeanUtils.copyProperties(order, pedidoAtual, "id", "uuid");
+
+		return pedidoRepository.save(pedidoAtual);
+
+	}
+
+	public boolean deletar(String uuid) {
+
+		Pedido pedido = this.obterPedidoPorUuid(uuid);
+
+		if (pedido != null) {
+
+			try {
+				pedidoRepository.delete(pedido);
+				return true;
+			} catch (EmptyResultDataAccessException ex) {
+				System.out.println(ex.getMessage());
+			}
+
+		}
+
+		return false;
+	}
+}

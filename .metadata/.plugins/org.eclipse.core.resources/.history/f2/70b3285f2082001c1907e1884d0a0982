@@ -1,0 +1,18 @@
+package com.utfpr.delivery.dto.pedidoItem;
+
+import java.math.BigDecimal;
+
+import javax.validation.constraints.NotNull;
+
+import com.utfpr.delivery.dto.produto.ProdutoDTO;
+
+import antlr.collections.List;
+import lombok.Data;
+
+@Data
+public class PedidoItemOutputDTO {
+	
+	@NotNull
+	private List<PedidoItemInputDTO> items;
+	
+}

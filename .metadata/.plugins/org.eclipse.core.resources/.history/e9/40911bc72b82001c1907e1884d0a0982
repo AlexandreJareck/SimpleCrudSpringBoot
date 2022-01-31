@@ -1,0 +1,11 @@
+package com.utfpr.delivery.dto.pedido;
+
+import java.math.BigDecimal;
+
+import lombok.Data;
+
+@Data
+public class PedidoOutoutDTO {
+	private String uuid;
+	private BigDecimal valorTotal;
+}

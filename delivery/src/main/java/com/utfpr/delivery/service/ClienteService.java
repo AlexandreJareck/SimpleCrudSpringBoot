@@ -1,56 +1,83 @@
 package com.utfpr.delivery.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.utfpr.delivery.dto.cliente.ClienteDTO;
+import com.utfpr.delivery.dto.cliente.ClienteInputDTO;
+import com.utfpr.delivery.dto.cliente.ClienteOutputDTO;
 import com.utfpr.delivery.entity.Cliente;
+import com.utfpr.delivery.exception.NotFoundException;
+import com.utfpr.delivery.mapper.cliente.ClienteDTOMapper;
+import com.utfpr.delivery.mapper.cliente.ClienteInputMapper;
+import com.utfpr.delivery.mapper.cliente.ClienteOutputMapper;
 import com.utfpr.delivery.repository.ClienteRepository;
 
 @Service
 public class ClienteService {
 
 	@Autowired
+	private ClienteOutputMapper clienteOutputMapper;
+	@Autowired
+	private ClienteDTOMapper clienteDTOMapper;
+	@Autowired
+	private ClienteInputMapper clienteInputMapper;
+	
+	@Autowired
 	private ClienteRepository clienteRepository;
+	
+	public List<ClienteOutputDTO> obterClientes() {
+		
+		List<Cliente> clientes = clienteRepository.findAll();	
+		List<ClienteOutputDTO> clienteOutputDTOs = clienteOutputMapper.mapearLista(clientes);
+		
+		return clienteOutputDTOs;
+	}	
 
-	public List<Cliente> listar() {
-		return clienteRepository.findAll();
-	}
+	public Cliente obterClientePorUuid(String uuid) {
+		
+		Cliente cliente = clienteRepository.findByUuid(uuid);		
 
-	public Cliente obterClientePorId(Long id) {
-		Optional<Cliente> cliente = clienteRepository.findById(id);
-
-		if (cliente.isPresent()) {
-			return cliente.get();
+		if (cliente == null) {
+			throw new NotFoundException("Cliente não encontrado");
 		}
 
-		return null;
+		return cliente;
+
 	}
+	
+	public ClienteDTO obterClienteDTOPorUuid(String uuid) {
 
-	public Cliente salvar(Cliente cliente) {
-		return clienteRepository.save(cliente);
+		return clienteDTOMapper.mapearDTO(obterClientePorUuid(uuid));
+
 	}
+	
+	public ClienteDTO salvar(ClienteInputDTO clienteInputDTO) {
 
-	public Cliente alterar(Long id, Cliente cliente) {
-
-		Cliente clienteAtual = this.obterClientePorId(id);
-
-		if (clienteAtual != null) {
-			BeanUtils.copyProperties(cliente, clienteAtual, "id");
-
-			return clienteRepository.save(clienteAtual);
-		}
-
-		return null;
+		Cliente cliente = clienteInputMapper.mapearEntity(clienteInputDTO);		
+		cliente = clienteRepository.save(cliente);		
+		
+		return clienteDTOMapper.mapearDTO(cliente);
 	}
+	
+	public ClienteDTO atualizar(String uuid, ClienteInputDTO clienteInputDTO) {		 
+		
+		Cliente cliente = clienteInputMapper.mapearEntity(clienteInputDTO);		
+		Cliente clienteAtual = this.obterClientePorUuid(uuid);
+		BeanUtils.copyProperties(cliente, clienteAtual, "id", "uuid");
+		
+		cliente = clienteRepository.save(clienteAtual);	
+		
+		return clienteDTOMapper.mapearDTO(cliente);		
+	}
+	
+	public boolean deletar(String uuid) {
 
-	public boolean deletar(Long id) {
-
-		Cliente cliente = this.obterClientePorId(id);
+		Cliente cliente = this.obterClientePorUuid(uuid);
 
 		if (cliente != null) {
 

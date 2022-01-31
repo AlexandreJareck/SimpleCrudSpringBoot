@@ -1,0 +1,35 @@
+package com.utfpr.delivery.mapper;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.utfpr.delivery.dto.ClienteDTO;
+import com.utfpr.delivery.dto.ClienteResumoDTO;
+import com.utfpr.delivery.dto.ProdutoDTO;
+import com.utfpr.delivery.entity.Cliente;
+import com.utfpr.delivery.entity.Produto;
+
+
+@Component
+public class ProdutoOutputMapper {
+
+	@Autowired
+	private ModelMapper modelMapper;
+
+	public ProdutoDTO mapearDTO(Cliente cliente) {
+
+		ProdutoDTO produtoDTO = modelMapper.map(cliente, ProdutoDTO.class);
+		
+		return produtoDTO;
+	}
+
+	public List<ProdutoDTO> mapearLista(List<Produto> clientes) {
+
+		return clientes.stream().map(cliente -> mapearDTO(cliente)).collect(Collectors.toList());
+	}
+
+}

@@ -1,56 +1,79 @@
 package com.utfpr.delivery.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.utfpr.delivery.dto.produto.ProdutoDTO;
+import com.utfpr.delivery.dto.produto.ProdutoInputDTO;
+import com.utfpr.delivery.dto.produto.ProdutoOutputDTO;
 import com.utfpr.delivery.entity.Produto;
+import com.utfpr.delivery.exception.NotFoundException;
+import com.utfpr.delivery.mapper.produto.ProdutoDTOMapper;
+import com.utfpr.delivery.mapper.produto.ProdutoInputMapper;
+import com.utfpr.delivery.mapper.produto.ProdutoOutputMapper;
 import com.utfpr.delivery.repository.ProdutoRepository;
 
 @Service
 public class ProdutoService {
 
 	@Autowired
+	private ProdutoOutputMapper produtoOutputMapper;
+	@Autowired
+	private ProdutoDTOMapper produtoDTOMapper;
+	@Autowired
+	private ProdutoInputMapper produtoInputMapper;
+
+	@Autowired
 	private ProdutoRepository produtoRepository;
 
-	public List<Produto> listar() {
-		return produtoRepository.findAll();
+	public List<ProdutoOutputDTO> obterProdutos() {
+
+		List<Produto> produtos = produtoRepository.findAll();
+
+		return produtoOutputMapper.mapearLista(produtos);
 	}
 
-	public Produto obterProdutoPorId(Long id) {
-		Optional<Produto> produto = produtoRepository.findById(id);
+	public Produto obterProdutoPorUuid(String uuid) {
 
-		if (produto.isPresent()) {
-			return produto.get();
+		Produto produto = produtoRepository.findByUuid(uuid);
+
+		if (produto == null) {
+			throw new NotFoundException("Produto não encontrado");
 		}
 
-		return null;
+		return produto;
+
 	}
 
-	public Produto salvar(Produto produto) {
-		return produtoRepository.save(produto);
+	public ProdutoDTO obterProdutoDTOPorUuid(String uuid) {
+		return produtoDTOMapper.mapearDTO(obterProdutoPorUuid(uuid));
 	}
 
-	public Produto alterar(Long id, Produto produto) {
+	public ProdutoDTO salvar(ProdutoInputDTO produtoInputDTO) {
+		Produto produto = produtoInputMapper.mapearEntity(produtoInputDTO);
+		produto = produtoRepository.save(produto);
 
-		Produto produtoAtual = this.obterProdutoPorId(id);
-
-		if (produtoAtual != null) {
-			BeanUtils.copyProperties(produto, produtoAtual, "id");
-
-			return produtoRepository.save(produtoAtual);
-		}
-
-		return null;
+		return produtoDTOMapper.mapearDTO(produto);
 	}
 
-	public boolean deletar(Long id) {
+	public ProdutoDTO atualizar(String uuid, ProdutoInputDTO produtoInputDTO) {
 
-		Produto produto = this.obterProdutoPorId(id);
+		Produto produto = produtoInputMapper.mapearEntity(produtoInputDTO);
+		Produto produtoAtual = this.obterProdutoPorUuid(uuid);
+		BeanUtils.copyProperties(produto, produtoAtual, "id", "uuid");
+
+		produto = produtoRepository.save(produtoAtual);
+		
+		return produtoDTOMapper.mapearDTO(produto);
+	}
+
+	public boolean deletar(String uuid) {
+
+		Produto produto = this.obterProdutoPorUuid(uuid);
 
 		if (produto != null) {
 

@@ -1,0 +1,117 @@
+package com.utfpr.delivery.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.utfpr.delivery.dto.ClienteDTO;
+import com.utfpr.delivery.dto.ProdutoDTO;
+import com.utfpr.delivery.entity.Cliente;
+import com.utfpr.delivery.entity.Produto;
+import com.utfpr.delivery.entity.Restaurante;
+import com.utfpr.delivery.exception.NotFoundException;
+import com.utfpr.delivery.repository.ProdutoRepository;
+
+@Service
+public class ProdutoService {
+
+	@Autowired
+	private ProdutoRepository produtoRepository;
+
+	public List<Produto> listar() {
+		return produtoRepository.findAll();
+	}
+
+	public Produto obterProdutoPorId(Long id) {
+		Optional<Produto> produto = produtoRepository.findById(id);
+
+		if (produto.isPresent()) {
+			return produto.get();
+		}
+
+		return null;
+	}
+
+	public Produto salvar(Produto produto) {
+		return produtoRepository.save(produto);
+	}
+
+	public Produto alterar(Long id, Produto produto) {
+
+		Produto produtoAtual = this.obterProdutoPorId(id);
+
+		if (produtoAtual != null) {
+			BeanUtils.copyProperties(produto, produtoAtual, "id");
+
+			return produtoRepository.save(produtoAtual);
+		}
+
+		return null;
+	}
+
+	public boolean deletar(Long id) {
+
+		Produto produto = this.obterProdutoPorId(id);
+
+		if (produto != null) {
+
+			try {
+				produtoRepository.delete(produto);
+				return true;
+			} catch (EmptyResultDataAccessException ex) {
+				System.out.println(ex.getMessage());
+			}
+
+		}
+
+		return false;
+	}
+		
+	public ProdutoDTO obterProdutoDTOporId(Long id) {
+		Optional<Produto> produto = produtoRepository.findById(id);
+		
+		if(!produto.isPresent()) {
+			throw new NotFoundException("produto não encontrado");
+		}
+		
+		return obterProdutoDTO(produto.get());
+	}
+	
+	public List<ProdutoDTO> obterClienteDTOs() {
+		
+		List<Produto> produtos = produtoRepository.findAll();
+		
+		if(produtos == null) {
+			return null;
+		}
+		
+		List<ProdutoDTO> produtosDTO = new ArrayList<ProdutoDTO>();
+		
+		for (Produto produto : produtos) {			
+			
+			produtosDTO.add(obterClienteDTO(produto));
+		}	
+		
+		return produtosDTO;
+		
+	}
+	
+	
+	public List<Produto> obterProdutosPorIdRestaurante(Long id) {
+		return produtoRepository.findByRestaurante(id);
+	}
+	
+	public ProdutoDTO obterClienteDTO(Produto cliente) {
+		Optional<Restaurante> restaurante = produtoRepository.findById(cliente.getRestauranteId());			
+		cliente.setRestaurante(restaurante.get());		
+		ClienteDTO clienteDTO = clienteResumoMapper.mapearDTO(cliente);			
+		clienteDTO.setRestaurante(restauranteService.obterRestauranteResumo(cliente.getRestauranteId()));
+		
+		return clienteDTO;
+	}
+}

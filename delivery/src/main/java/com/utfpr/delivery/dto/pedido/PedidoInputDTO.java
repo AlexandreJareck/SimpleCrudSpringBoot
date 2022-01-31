@@ -1,0 +1,15 @@
+package com.utfpr.delivery.dto.pedido;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import com.utfpr.delivery.dto.pedidoItem.PedidoItemInputDTO;
+
+import lombok.Data;
+
+@Data
+public class PedidoInputDTO {
+	private String restaurante;
+	private String cliente;
+	private BigDecimal valorTotal;
+}

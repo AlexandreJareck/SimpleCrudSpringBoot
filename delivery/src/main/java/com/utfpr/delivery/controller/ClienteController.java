@@ -16,14 +16,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.utfpr.delivery.dto.ClienteResumoDTO;
-import com.utfpr.delivery.dto.ProdutoResumoDTO;
+import com.utfpr.delivery.dto.cliente.ClienteDTO;
+import com.utfpr.delivery.dto.cliente.ClienteInputDTO;
+import com.utfpr.delivery.dto.cliente.ClienteOutputDTO;
 import com.utfpr.delivery.entity.Cliente;
-import com.utfpr.delivery.entity.Produto;
-import com.utfpr.delivery.mapper.ClienteResumoOutputMapper;
-import com.utfpr.delivery.mapper.ProdutoResumoOutputMapper;
 import com.utfpr.delivery.service.ClienteService;
-import com.utfpr.delivery.service.ProdutoService;
 
 @RestController
 @RequestMapping("/clientes")
@@ -32,42 +29,36 @@ public class ClienteController {
 	@Autowired
 	private ClienteService clienteService;
 
-	@Autowired
-	private ClienteResumoOutputMapper clienteResumoOutputMapper;
 
 	@GetMapping
 	@ResponseBody
-	public List<ClienteResumoDTO> obterClientes() {
-
-		return clienteResumoOutputMapper.mapearLista(clienteService.listar());
+	public List<ClienteOutputDTO> obterClientes() {
+		return clienteService.obterClientes();		
 	}
-
-	@GetMapping("/{id}")
+	
+	@GetMapping("/{uuid}")
 	@ResponseBody
-	public Cliente obterClientePorId(@PathVariable Long id) {
-
-		return clienteService.obterClientePorId(id);
+	public ClienteDTO obterClientePorUuid(@PathVariable String uuid) {		
+		return clienteService.obterClienteDTOPorUuid(uuid);				
 	}
 
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	private Cliente adicionar(@RequestBody Cliente cliente) {
+	private ClienteDTO adicionar(@RequestBody ClienteInputDTO clienteInputDTO) {
 		
-		return clienteService.salvar(cliente);
-
+		return clienteService.salvar(clienteInputDTO);
 	}
 
-	@PutMapping("/{id}")
+	@PutMapping("/{uuid}")
 	@ResponseStatus(code = HttpStatus.OK)
-	private Cliente alterar(@PathVariable Long id, @RequestBody Cliente cliente) {
-
-		return clienteService.alterar(id, cliente);
+	private ClienteDTO alterar(@PathVariable String uuid, @RequestBody ClienteInputDTO clienteInputDTO) {		
+		return clienteService.atualizar(uuid, clienteInputDTO);			
 	}
 
-	@DeleteMapping("/{id}")
-	private ResponseEntity deletar(@PathVariable Long id) {
+	@DeleteMapping("/{uuid}")
+	private ResponseEntity<Cliente> deletar(@PathVariable String uuid) {
 
-		if (clienteService.deletar(id)) {
+		if (clienteService.deletar(uuid)) {
 			return ResponseEntity.noContent().build();
 		}
 

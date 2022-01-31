@@ -1,0 +1,5 @@
+package com.utfpr.delivery.mapper.cliente;
+
+public class ClienteInputMapper {
+
+}

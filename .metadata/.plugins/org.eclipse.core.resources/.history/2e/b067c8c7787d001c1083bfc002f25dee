@@ -1,0 +1,16 @@
+spring.datasource.url=jdbc:mysql://localhost:3306/delivery?serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=33821243
+
+spring.jpa.generate-ddl=true
+spring.jpa.hibernate.ddl-auto=true
+
+
+##spring.security.user.name=delivery
+##spring.security.user.password=123
+
+spring.security.oauth2.resourceserver.opaquetoken.introspection-uri=http://localhost:8080/oauth/check_token
+spring.security.oauth2.resourceserver.opaquetoken.client-id=checktoken
+spring.security.oauth2.resourceserver.opaquetoken.client-secret=123
+
+

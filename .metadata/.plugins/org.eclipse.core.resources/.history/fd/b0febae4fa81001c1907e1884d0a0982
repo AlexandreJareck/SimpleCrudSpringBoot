@@ -1,0 +1,69 @@
+package com.utfpr.delivery.service;
+
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.utfpr.delivery.entity.Produto;
+import com.utfpr.delivery.exception.NotFoundException;
+import com.utfpr.delivery.repository.ProdutoRepository;
+
+@Service
+public class ProdutoItem2Service {
+
+	@Autowired
+	private ProdutoRepository produtoRepository;
+	
+	public List<Produto> obterProdutos() {
+		return produtoRepository.findAll();
+	}	
+
+	public Produto obterProdutoPorUuid(String uuid) {
+		
+		Produto produto = produtoRepository.findByUuid(uuid);
+
+		if (produto == null) {
+			throw new NotFoundException("Produto não encontrado");
+		}
+
+		return produto;
+
+	}
+	
+	public Produto salvar(Produto produto) {
+
+		return produtoRepository.save(produto);
+
+	}
+	
+	public Produto atualizar(String uuid, Produto produto) {
+		 
+		Produto produtoAtual = this.obterProdutoPorUuid(uuid);
+ 
+		BeanUtils.copyProperties(produto, produtoAtual, "id", "uuid");
+
+		return produtoRepository.save(produtoAtual);
+
+	}
+	
+	public boolean deletar(String uuid) {
+
+		Produto produto = this.obterProdutoPorUuid(uuid);
+
+		if (produto != null) {
+
+			try {
+				produtoRepository.delete(produto);
+				return true;
+			} catch (EmptyResultDataAccessException ex) {
+				System.out.println(ex.getMessage());
+			}
+
+		}
+
+		return false;
+	}
+}

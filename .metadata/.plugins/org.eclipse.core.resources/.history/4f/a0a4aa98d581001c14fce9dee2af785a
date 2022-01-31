@@ -1,0 +1,5 @@
+package com.utfpr.delivery.dto.cliente;
+
+public class ClienteDTO {
+
+}

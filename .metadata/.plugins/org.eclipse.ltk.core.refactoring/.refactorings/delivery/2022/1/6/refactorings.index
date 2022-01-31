@@ -1,0 +1,73 @@
+1643506431160	Copy compilation unit
+1643506527125	Copy compilation unit
+1643550674196	Copy compilation unit
+1643550811910	Copy compilation unit
+1643550865669	Copy compilation unit
+1643550950065	Copy compilation unit
+1643550993872	Rename type 'ClienteOutputMapper'
+1643551268880	Copy compilation unit
+1643551292662	Delete element
+1643551294510	Delete element
+1643551401811	Delete element
+1643551406110	Delete element
+1643551431210	Delete element
+1643551528650	Copy compilation unit
+1643551556176	Copy compilation unit
+1643551588319	Delete element
+1643551593568	Delete element
+1643551595824	Delete element
+1643551835057	Copy compilation unit
+1643551948205	Copy compilation unit
+1643554228161	Copy compilation unit
+1643554241998	Rename type 'ClienteDTOMapper'
+1643554359753	Copy compilation unit
+1643554398899	Copy compilation unit
+1643554436125	Delete element
+1643554439336	Delete element
+1643554453744	Copy compilation unit
+1643554571344	Copy compilation unit
+1643554579152	Rename type 'ClienteInputMapper'
+1643554650455	Copy compilation unit
+1643554658781	Rename type 'ClienteOutputMapper'
+1643554862829	Delete element
+1643554865119	Delete element
+1643555743742	Copy compilation unit
+1643555777869	Delete element
+1643555783858	Copy compilation unit
+1643555798509	Delete element
+1643555806329	Copy compilation unit
+1643555817421	Rename type 'RestauranteResumoDTO'
+1643555823985	Delete element
+1643555959615	Copy compilation unit
+1643555980040	Delete element
+1643555988691	Copy compilation unit
+1643556021743	Rename type 'RestauranteOutputMapper'
+1643556028867	Delete element
+1643556031249	Copy compilation unit
+1643556042799	Rename type 'RestauranteResumoOutputMapper'
+1643556080621	Delete element
+1643562080729	Copy compilation unit
+1643562127452	Copy compilation unit
+1643562141157	Copy compilation unit
+1643564540006	Copy compilation unit
+1643564587659	Rename type 'PedidoDTO'
+1643566374970	Copy compilation unit
+1643566885991	Copy compilation unit
+1643566905739	Rename type 'PedidoOutputMapper'
+1643567051427	Rename type 'PedidoOutputMapper'
+1643567076161	Copy compilation unit
+1643567159074	Copy compilation unit
+1643567235257	Copy compilation unit
+1643567477468	Rename type 'ProdutoService'
+1643567512104	Rename type 'ProdutoItem2Service'
+1643567688770	Rename package 'com.utfpr.delivery.dto.produtoItem'
+1643568094837	Delete element
+1643569956071	Delete element
+1643570364451	Copy compilation unit
+1643570436618	Copy compilation unit
+1643570747376	Copy compilation unit
+1643570760839	Rename type 'PedidoItemInputDTOMapper'
+1643583568074	Copy compilation unit
+1643583705036	Rename type 'PedidoItemOutputDTO'
+1643584617851	Copy compilation unit
+1643588507744	Delete element

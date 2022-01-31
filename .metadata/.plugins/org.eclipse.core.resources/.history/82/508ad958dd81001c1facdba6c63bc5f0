@@ -1,0 +1,75 @@
+package com.utfpr.delivery.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.utfpr.delivery.entity.Cliente;
+import com.utfpr.delivery.entity.Produto;
+import com.utfpr.delivery.entity.Restaurante;
+import com.utfpr.delivery.exception.NotFoundException;
+import com.utfpr.delivery.mapper.ProdutoOutputMapper;
+import com.utfpr.delivery.repository.ClienteRepository;
+import com.utfpr.delivery.repository.ProdutoRepository;
+
+@Service
+public class ProdutoService {
+
+	@Autowired
+	private ProdutoRepository produtoRepository;
+	
+	public List<Produto> obterProdutos() {
+		return produtoRepository.findAll();
+	}	
+
+	public Produto obterClientePorUuid(String uuid) {
+		
+		Produto cliente = produtoRepository.findByUuid(uuid);
+
+		if (cliente == null) {
+			throw new NotFoundException("Client não encontrado");
+		}
+
+		return cliente;
+
+	}
+	
+	public Produto salvar(Cliente cliente) {
+
+		return produtoRepository.save(cliente);
+
+	}
+	
+	public Produto atualizar(String uuid, Cliente cliente) {
+		 
+		Produto clienteAtual = this.obterClientePorUuid(uuid);
+ 
+		BeanUtils.copyProperties(cliente, clienteAtual, "id", "uuid");
+
+		return produtoRepository.save(clienteAtual);
+
+	}
+	
+	public boolean deletar(String uuid) {
+
+		Produto cliente = this.obterClientePorUuid(uuid);
+
+		if (cliente != null) {
+
+			try {
+				produtoRepository.delete(cliente);
+				return true;
+			} catch (EmptyResultDataAccessException ex) {
+				System.out.println(ex.getMessage());
+			}
+
+		}
+
+		return false;
+	}
+}

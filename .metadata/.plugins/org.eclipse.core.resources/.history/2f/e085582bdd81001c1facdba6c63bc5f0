@@ -1,0 +1,137 @@
+package com.utfpr.delivery.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.utfpr.delivery.dto.ProdutoDTO;
+import com.utfpr.delivery.entity.Produto;
+import com.utfpr.delivery.entity.Restaurante;
+import com.utfpr.delivery.exception.NotFoundException;
+import com.utfpr.delivery.mapper.ProdutoOutputMapper;
+import com.utfpr.delivery.repository.ProdutoRepository;
+
+@Service
+public class ProdutoService {
+
+	@Autowired
+	private ProdutoRepository produtoRepository;
+	@Autowired
+	private RestauranteService restauranteService;
+	@Autowired
+	private ProdutoOutputMapper produtoOutputMapper;
+
+	public List<Produto> listar() {
+		return produtoRepository.findAll();
+	}
+
+	public Produto obterProdutoPorId(Long id) {
+		Optional<Produto> produto = produtoRepository.findById(id);
+
+		if (produto.isPresent()) {
+			return produto.get();
+		}
+
+		return null;
+	}
+
+	public ProdutoDTO salvar(Produto produto) {
+		
+		Restaurante restaurante = restauranteService.ObterRestauranteComValidacao(produto.getRestauranteId());
+			
+		produto.setRestaurante(restaurante);
+		
+		produto = produtoRepository.save(produto);
+		
+		ProdutoDTO produtoDTO = produtoOutputMapper.mapearDTO(produto);			
+		produtoDTO.setRestaurante(restauranteService.obterRestauranteResumo(produto.getRestauranteId()));
+		
+		return produtoDTO;
+	}
+
+	public ProdutoDTO alterar(Long id, Produto produto) {
+
+		restauranteService.ObterRestauranteComValidacao(produto.getRestauranteId());	
+		
+		Produto produtoAtual = this.obterProdutoPorId(id);
+
+		if (produtoAtual != null) {
+			BeanUtils.copyProperties(produto, produtoAtual, "id");
+
+			produtoAtual = produtoRepository.save(produtoAtual);
+			
+			ProdutoDTO produtoDTO = produtoOutputMapper.mapearDTO(produto);			
+			produtoDTO.setRestaurante(restauranteService.obterRestauranteResumo(produtoAtual.getRestauranteId()));
+			
+			return produtoDTO;		
+			
+		}
+
+		return null;
+	}
+
+	public boolean deletar(Long id) {
+
+		Produto produto = this.obterProdutoPorId(id);
+
+		if (produto != null) {
+
+			try {
+				produtoRepository.delete(produto);
+				return true;
+			} catch (EmptyResultDataAccessException ex) {
+				System.out.println(ex.getMessage());
+			}
+
+		}
+
+		return false;
+	}
+		
+	public ProdutoDTO obterProdutoDTOporId(Long id) {
+		Optional<Produto> produto = produtoRepository.findById(id);
+		
+		if(!produto.isPresent()) {
+			throw new NotFoundException("produto não encontrado");
+		}
+		
+		return obterProdutoDTO(produto.get());
+	}
+	
+	public List<ProdutoDTO> obterProdutoDTOs() {
+		
+		List<Produto> produtos = produtoRepository.findAll();
+		
+		if(produtos == null) {
+			return null;
+		}
+		
+		List<ProdutoDTO> produtosDTO = new ArrayList<ProdutoDTO>();
+		
+		for (Produto produto : produtos) {			
+			
+			produtosDTO.add(obterProdutoDTO(produto));
+		}	
+		
+		return produtosDTO;
+		
+	}
+		
+	public List<Produto> obterProdutosPorIdRestaurante(Long id) {
+		return produtoRepository.findByRestaurante(id);
+	}
+	
+	public ProdutoDTO obterProdutoDTO(Produto produto) {
+		Restaurante restaurante = restauranteService.ObterRestauranteComValidacao(produto.getRestauranteId());		
+		produto.setRestaurante(restaurante);		
+		ProdutoDTO produtoDTO = produtoOutputMapper.mapearDTO(produto);			
+		produtoDTO.setRestaurante(restauranteService.obterRestauranteResumo(produto.getRestauranteId()));
+		
+		return produtoDTO;
+	}
+}

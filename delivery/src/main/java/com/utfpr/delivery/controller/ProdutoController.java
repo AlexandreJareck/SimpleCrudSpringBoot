@@ -16,9 +16,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.utfpr.delivery.dto.ProdutoResumoDTO;
+import com.utfpr.delivery.dto.produto.ProdutoDTO;
+import com.utfpr.delivery.dto.produto.ProdutoInputDTO;
+import com.utfpr.delivery.dto.produto.ProdutoOutputDTO;
 import com.utfpr.delivery.entity.Produto;
-import com.utfpr.delivery.mapper.ProdutoResumoOutputMapper;
 import com.utfpr.delivery.service.ProdutoService;
 
 @RestController
@@ -27,43 +28,36 @@ public class ProdutoController {
 
 	@Autowired
 	private ProdutoService produtoService;
-
-	@Autowired
-	private ProdutoResumoOutputMapper produtoResumoOutputMapper;
-
+	
+	
 	@GetMapping
 	@ResponseBody
-	public List<ProdutoResumoDTO> obterProdutos() {
-
-		return produtoResumoOutputMapper.mapearLista(produtoService.listar());
+	public List<ProdutoOutputDTO> obterProdutos() {
+		return produtoService.obterProdutos();
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping("/{uuid}")
 	@ResponseBody
-	public Produto obterProdutoPorId(@PathVariable Long id) {
-
-		return produtoService.obterProdutoPorId(id);
+	public ProdutoDTO obterProdutoPorUuid(@PathVariable String uuid) {
+		return produtoService.obterProdutoDTOPorUuid(uuid);
 	}
 
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	private Produto adicionar(@RequestBody Produto produto) {
-		
-		return produtoService.salvar(produto);
-
+	private ProdutoDTO adicionar(@RequestBody ProdutoInputDTO produtoInputDTO) {		
+		return produtoService.salvar(produtoInputDTO);
 	}
 
-	@PutMapping("/{id}")
+	@PutMapping("/{uuid}")
 	@ResponseStatus(code = HttpStatus.OK)
-	private Produto alterar(@PathVariable Long id, @RequestBody Produto produto) {
-
-		return produtoService.alterar(id, produto);
+	private ProdutoDTO alterar(@PathVariable String uuid, @RequestBody ProdutoInputDTO produtoInputDTO) {		
+		return produtoService.atualizar(uuid, produtoInputDTO);
 	}
 
-	@DeleteMapping("/{id}")
-	private ResponseEntity deletar(@PathVariable Long id) {
+	@DeleteMapping("/{uuid}")
+	private ResponseEntity<Produto> deletar(@PathVariable String uuid) {
 
-		if (produtoService.deletar(id)) {
+		if (produtoService.deletar(uuid)) {
 			return ResponseEntity.noContent().build();
 		}
 

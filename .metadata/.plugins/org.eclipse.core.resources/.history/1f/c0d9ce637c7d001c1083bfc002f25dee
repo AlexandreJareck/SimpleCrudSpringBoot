@@ -1,0 +1,17 @@
+package com.utfpr.delivery.dto;
+
+import java.util.List;
+
+import com.utfpr.delivery.entity.Cliente;
+
+import lombok.Data;
+
+@Data
+public class RestauranteResumoDTO {
+	
+	private Long id;
+	private String uuid;
+	private String nome;
+	private List<Cliente> clientes;	
+}
+

@@ -1,0 +1,17 @@
+package com.utfpr.delivery.dto.restaurante;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import com.utfpr.delivery.entity.Cliente;
+import com.utfpr.delivery.entity.Produto;
+
+import lombok.Data;
+
+@Data
+public class RestauranteDTO {
+	private Long id;
+	private String uuid;
+	private String nome;
+	private BigDecimal taxaFrete;
+}

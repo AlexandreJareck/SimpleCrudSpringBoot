@@ -1,0 +1,15 @@
+package com.utfpr.delivery.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+
+import com.utfpr.delivery.entity.Pedido;
+import com.utfpr.delivery.entity.Produto;
+
+public interface PedidoRepository extends JpaRepository<Pedido, Long> {
+	
+	public Pedido findByUuid(String uuid);
+	
+}

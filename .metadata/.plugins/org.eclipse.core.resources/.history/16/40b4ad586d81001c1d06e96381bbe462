@@ -1,0 +1,111 @@
+package com.utfpr.delivery.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.utfpr.delivery.dto.ClienteDTO;
+import com.utfpr.delivery.entity.Cliente;
+import com.utfpr.delivery.entity.Produto;
+import com.utfpr.delivery.exception.NotFoundException;
+import com.utfpr.delivery.repository.ProdutoRepository;
+
+@Service
+public class ProdutoService {
+
+	@Autowired
+	private ProdutoRepository produtoRepository;
+
+	public List<Produto> listar() {
+		return produtoRepository.findAll();
+	}
+
+	public Produto obterProdutoPorId(Long id) {
+		Optional<Produto> produto = produtoRepository.findById(id);
+
+		if (produto.isPresent()) {
+			return produto.get();
+		}
+
+		return null;
+	}
+
+	public Produto salvar(Produto produto) {
+		return produtoRepository.save(produto);
+	}
+
+	public Produto alterar(Long id, Produto produto) {
+
+		Produto produtoAtual = this.obterProdutoPorId(id);
+
+		if (produtoAtual != null) {
+			BeanUtils.copyProperties(produto, produtoAtual, "id");
+
+			return produtoRepository.save(produtoAtual);
+		}
+
+		return null;
+	}
+
+	public boolean deletar(Long id) {
+
+		Produto produto = this.obterProdutoPorId(id);
+
+		if (produto != null) {
+
+			try {
+				produtoRepository.delete(produto);
+				return true;
+			} catch (EmptyResultDataAccessException ex) {
+				System.out.println(ex.getMessage());
+			}
+
+		}
+
+		return false;
+	}
+	
+	public List<Produto> obterProdutosPorIdRestaurante(Long id) {
+		return produtoRepository.findByRestaurante(id);
+	}
+	
+	public ClienteDTO obterClienteDTOporId(Long id) {
+		Optional<Cliente> cliente = clienteRepository.findById(id);
+		
+		if(!cliente.isPresent()) {
+			throw new NotFoundException("cliente não encontrado");
+		}
+		
+		return obterClienteDTO(cliente.get());
+	}
+	
+	public List<ClienteDTO> obterClienteDTOs() {
+		
+		List<Cliente> clientes = clienteRepository.findAll();
+		
+		if(clientes == null) {
+			return null;
+		}
+		
+		List<ClienteDTO> clientesDTO = new ArrayList<ClienteDTO>();
+		
+		for (Cliente cliente : clientes) {			
+			
+			clientesDTO.add(obterClienteDTO(cliente));
+		}	
+		
+		return clientesDTO;
+		
+	}
+	
+	public ClienteDTO obterClienteDTO(Cliente cliente) {
+	
+	public List<Produto> obterProdutosPorIdRestaurante(Long id) {
+		return produtoRepository.findByRestaurante(id);
+	}
+}

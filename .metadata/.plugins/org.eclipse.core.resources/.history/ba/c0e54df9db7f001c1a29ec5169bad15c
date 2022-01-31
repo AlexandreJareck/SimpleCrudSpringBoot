@@ -1,0 +1,16 @@
+package com.utfpr.delivery.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.utfpr.delivery.entity.Produto;
+import com.utfpr.delivery.entity.Restaurante;
+
+public interface ProdutoRepository extends JpaRepository<Produto, Long> {
+
+	List<Produto> findByRestaurante(Long restaurante);
+	
+	public Produto findByUuid(String uuid);
+	
+}

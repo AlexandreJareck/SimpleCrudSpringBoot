@@ -1,16 +1,15 @@
 package com.utfpr.delivery.entity;
 
-import java.math.BigDecimal;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
@@ -23,16 +22,22 @@ public class Cliente {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@Column(name = "uuid", length = 36)
+	private String uuid;
+	
+	@NotNull
 	@Column(length = 100, nullable = false)
-	private String nome;
+	private String nome;	
 	
 	@Column(length = 150)
 	private String email;
 	
-	@Column(name = "limite_credito", nullable = false)
-	private BigDecimal limeteCredito;
+	@NotNull
+	@Column(length = 20)
+	private String telefone;
 	
-	@Column(name = "restaurante_idf")
-	private Long restaurante;
-
+	@PrePersist
+	private void gerarUUID() {
+		setUuid(UUID.randomUUID().toString());
+	}
 }

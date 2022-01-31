@@ -15,22 +15,24 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "tbl_restaurante")
+@Table(name = "restaurante")
 public class Restaurante {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@Column(name = "uuid", length = 36)
 	private String uuid;
-	
+
+	@Column(length = 100)
 	private String nome;
-	private BigDecimal taxaFrete;
 	
+	@Column(name = "taxa_frete")
+	private BigDecimal taxaFrete;
+
 	@PrePersist
 	private void gerarUUID() {
 		setUuid(UUID.randomUUID().toString());
 	}
-	
 }

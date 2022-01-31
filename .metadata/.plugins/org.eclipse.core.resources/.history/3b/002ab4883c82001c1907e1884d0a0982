@@ -1,0 +1,199 @@
+package com.utfpr.delivery.controller;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.utfpr.delivery.dto.pedido.PedidoDTO;
+import com.utfpr.delivery.dto.pedido.PedidoInputDTO;
+import com.utfpr.delivery.dto.pedidoItem.PedidoItemDTO;
+import com.utfpr.delivery.dto.pedidoItem.PedidoItemInputDTO;
+import com.utfpr.delivery.dto.pedidoItem.PedidoItemsDTO;
+import com.utfpr.delivery.entity.Cliente;
+import com.utfpr.delivery.entity.Pedido;
+import com.utfpr.delivery.entity.PedidoItem;
+import com.utfpr.delivery.entity.Produto;
+import com.utfpr.delivery.entity.Restaurante;
+import com.utfpr.delivery.mapper.pedido.PedidoDTOMapper;
+import com.utfpr.delivery.mapper.pedido.PedidoInputDTOMapper;
+import com.utfpr.delivery.mapper.pedidoItem.PedidoItemDTOMapper;
+import com.utfpr.delivery.mapper.pedidoItem.PedidoItemInputDTOMapper;
+import com.utfpr.delivery.mapper.pedidoItem.PedidoItemsDTOMapper;
+import com.utfpr.delivery.service.ClienteService;
+import com.utfpr.delivery.service.PedidoItemService;
+import com.utfpr.delivery.service.PedidoService;
+import com.utfpr.delivery.service.ProdutoService;
+import com.utfpr.delivery.service.RestauranteService;
+
+@RestController
+@RequestMapping("/pedidos")
+public class PedidoController {
+
+	@Autowired
+	private PedidoService pedidoService;
+	@Autowired
+	private RestauranteService restauranteService;
+	@Autowired
+	private ClienteService clienteService;
+	@Autowired
+	private ProdutoService produtoService;
+	@Autowired
+	private PedidoItemService pedidoItemService;
+
+	@Autowired
+	private PedidoDTOMapper pedidoOutputMapper;
+	@Autowired
+	private PedidoInputDTOMapper pedidoInputDTOMapper;
+	@Autowired
+	private PedidoItemInputDTOMapper pedidoItemInputDTOMapper;
+	@Autowired
+	private PedidoItemDTOMapper pedidoItemDTOMapper;
+	@Autowired
+	private PedidoItemsDTOMapper pedidoItemsDTOMapper;
+
+	@GetMapping
+	@ResponseBody
+	public List<PedidoDTO> obterPedidos() {
+
+		List<Pedido> pedidos = pedidoService.listar();
+
+		return pedidoOutputMapper.mapearLista(pedidos);
+	}
+
+	@GetMapping("/{uuid}")
+	@ResponseBody
+	public PedidoDTO obterPedidoPorUuid(@PathVariable String uuid) {
+
+		Pedido pedido = pedidoService.obterPedidoPorUuid(uuid);
+
+		PedidoDTO pedidoDTO = pedidoOutputMapper.mapearDTO(pedido);
+
+		return pedidoDTO;
+	}
+	
+	@GetMapping("/{uuid}/pedidoItems")
+	@ResponseBody
+	public List<PedidoItemDTO> obterPedidoItems(@PathVariable(value = "uuid") String uuid) {
+
+		List<PedidoItem> pedidoItemss = pedidoItemService.listarItems(uuid);
+
+		List<PedidoItemDTO> pedidoItemDTOs = pedidoItemDTOMapper.mapearLista(pedidoItemss);
+
+		return pedidoItemDTOs;
+
+	}
+
+	@PostMapping
+	@ResponseStatus(code = HttpStatus.CREATED)
+	private PedidoDTO adicionar(@RequestBody @Valid PedidoInputDTO pedidoInputDTO) {
+
+		Pedido pedido = pedidoInputDTOMapper.mapearEntity(pedidoInputDTO);
+		
+		Cliente cliente = clienteService.obterClientePorUuid(pedidoInputDTO.getCliente());
+		pedido.setCliente(cliente);
+		
+		Restaurante restaurante = restauranteService.obterRestaurantePorUuid(pedidoInputDTO.getRestaurante());
+		pedido.setRestaurante(restaurante);
+		
+		pedido = pedidoService.salvar(pedido);
+
+		PedidoDTO pedidoDTO = pedidoOutputMapper.mapearDTO(pedido);
+
+		return pedidoDTO;
+
+	}
+	
+	@PostMapping("/{uuid}/pedidoItems")
+	@ResponseStatus(code = HttpStatus.CREATED)
+	private List<PedidoItemDTO> adicionarItemNoPedido(@RequestBody @Valid PedidoItemsDTO pedidoItemsDTO,@PathVariable(value = "uuid") String uuid) {
+
+		Pedido pedido = pedidoService.obterPedidoPorUuid(uuid);
+
+		List<PedidoItem> pedidoItems = new ArrayList<PedidoItem>();			
+		
+		for (PedidoItemInputDTO item : pedidoItemsDTO.getPedidoItems()) {
+
+			PedidoItem pedidoItem = pedidoItemInputDTOMapper.mapearEntity(item);
+
+			Produto produto = produtoService.obterProdutoPorUuid(item.getProduto());
+			pedidoItem.setProduto(produto);
+			pedidoItem.setPedido(pedido);
+			pedidoItem.setQuantidade(item.getQuantidade());
+			pedidoItem.setValor(produto.getPreco().multiply(new BigDecimal(item.getQuantidade())));
+			pedidoItem = pedidoItemService.salvar(pedidoItem);
+
+			pedidoItems.add(pedidoItem);
+		}
+
+		List<PedidoItemDTO> orderItemDTO = pedidoItemsDTOMapper.mapearDTO(pedidoItems);
+
+		return orderItemDTO;
+
+	}
+	
+	@PutMapping("/{pedidoUuid}/pedidoItems/{uuid}")
+	@ResponseBody
+	private PedidoItemDTO update(@PathVariable String pedidoUuid, @PathVariable String uuid, @Valid @RequestBody PedidoItemInputDTO pedidoItemInputDTO) {
+		
+		Pedido pedido = pedidoService.obterPedidoPorUuid(pedidoUuid);		
+		PedidoItem pedidoItem = pedidoItemInputDTOMapper.mapearEntity(pedidoItemInputDTO);		
+		Produto produto = produtoService.obterProdutoPorUuid(pedidoItemInputDTO.getProduto());
+		
+		pedidoItem.setProduto(produto);
+		pedidoItem.setPedido(pedido);		
+		pedidoItem = pedidoItemService.adicionar(uuid, pedidoItem);
+
+		PedidoItemDTO pedidoItemDTO = pedidoItemDTOMapper.mapearDTO(pedidoItem);
+		
+		return pedidoItemDTO;
+		
+	}
+
+	@PutMapping("/{uuid}")
+	@ResponseStatus(code = HttpStatus.OK)
+	private PedidoDTO alterar(@PathVariable String uuid, @RequestBody PedidoInputDTO pedidoInputDTO) {
+
+		Pedido pedido = pedidoInputDTOMapper.mapearEntity(pedidoInputDTO);
+
+		Restaurante restaurante = restauranteService.obterRestaurantePorUuid(pedidoInputDTO.getRestaurante());
+		pedido.setRestaurante(restaurante);
+
+		Cliente cliente = clienteService.obterClientePorUuid(pedidoInputDTO.getCliente());
+		pedido.setCliente(cliente);
+
+		pedido = pedidoService.alterar(uuid, pedido);
+
+		PedidoDTO pedidoDTO = pedidoOutputMapper.mapearDTO(pedido);
+
+		return pedidoDTO;
+		
+	}
+
+	@DeleteMapping("/{uuid}")
+	private ResponseEntity<Pedido> deletar(@PathVariable String uuid) {
+
+		if (pedidoService.deletar(uuid)) {
+			return ResponseEntity.noContent().build();
+		}
+
+		return ResponseEntity.badRequest().build();
+	}
+
+	
+}

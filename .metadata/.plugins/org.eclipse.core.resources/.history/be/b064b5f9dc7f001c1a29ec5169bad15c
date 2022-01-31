@@ -1,0 +1,95 @@
+package com.utfpr.delivery.service;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.utfpr.delivery.dto.PedidoDTO;
+import com.utfpr.delivery.entity.Pedido;
+import com.utfpr.delivery.entity.Restaurante;
+import com.utfpr.delivery.exception.NotFoundException;
+import com.utfpr.delivery.repository.PedidoRepository;
+import com.utfpr.delivery.repository.RestauranteRepository;
+
+@Service
+public class PedidoService {
+
+	@Autowired
+	private RestauranteRepository restauranteRepository;
+	@Autowired
+	private PedidoRepository pedidoRepository;
+	@Autowired
+	private ClienteService clienteService;
+	@Autowired
+	private ProdutoService produtoService;
+	@Autowired
+	ObjectMapper objectMapper;
+
+	public List<Pedido> listar() {
+		List<Pedido> pedidos =pedidoRepository.findAll();		
+		
+		return pedidos;
+	}
+
+	public Pedido obterPedidoPorId(Long id) {
+		Optional<Pedido> pedido = pedidoRepository.findById(id);
+
+		if (pedido.isPresent()) {
+			return pedido.get();
+		}
+
+		return null;
+	}
+
+	public Pedido obterPedidoPorUuid(String uuid) {
+		
+		Pedido pedido = pedidoRepository.findByUuid(uuid);
+		
+		if(pedido == null) {
+			throw new NotFoundException("Pedido não encontrado");
+		}
+		
+		return pedido;
+
+	}
+
+	public Pedido salvar(Pedido pedido) {
+		
+		return pedidoRepository.save(pedido);
+	}
+
+	public Pedido alterar(String uuid, Pedido pedido) {
+
+		Pedido pedidoAtual = this.obterPedidoPorUuid(uuid);
+
+		if (pedidoAtual != null) {
+			BeanUtils.copyProperties(pedido, pedidoAtual, "id", "uuid");
+
+			return pedidoRepository.save(pedidoAtual);
+		}
+
+		return null;
+	}
+
+	public boolean deletar(String uuid) {
+
+		Pedido pedido = this.obterPedidoPorUuid(uuid);
+
+		if (pedido != null) {
+
+			try {
+				restauranteRepository.delete(pedido);
+				return true;
+			} catch (EmptyResultDataAccessException ex) {
+				System.out.println(ex.getMessage());
+			}
+
+		}
+
+		return false;
+	}
+}

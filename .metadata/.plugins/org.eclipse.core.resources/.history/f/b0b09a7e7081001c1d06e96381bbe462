@@ -1,0 +1,137 @@
+package com.utfpr.delivery.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.utfpr.delivery.dto.ClienteDTO;
+import com.utfpr.delivery.entity.Cliente;
+import com.utfpr.delivery.entity.Restaurante;
+import com.utfpr.delivery.exception.NotFoundException;
+import com.utfpr.delivery.mapper.ClienteOutputMapper;
+import com.utfpr.delivery.repository.ClienteRepository;
+import com.utfpr.delivery.repository.RestauranteRepository;
+
+@Service
+public class ClienteService {
+
+	@Autowired
+	private ClienteRepository clienteRepository;
+	@Autowired
+	private RestauranteRepository restauranteRepository;
+	@Autowired
+	private RestauranteService restauranteService;
+	@Autowired
+	private ClienteOutputMapper clienteOutputMapper;	
+
+	public Cliente obterClientePorId(Long id) {
+		Optional<Cliente> cliente = clienteRepository.findById(id);
+
+		if (cliente.isPresent()) {
+			return cliente.get();
+		}
+
+		return null;
+	}
+
+	public ClienteDTO salvar(Cliente cliente) {
+		
+		Restaurante restaurante = restauranteService.ObterRestauranteComValidacao(cliente.getRestauranteId());
+			
+		cliente.setRestaurante(restaurante);
+		
+		cliente = clienteRepository.save(cliente);
+		
+		ClienteDTO clienteDTO = clienteOutputMapper.mapearDTO(cliente);			
+		clienteDTO.setRestaurante(restauranteService.obterRestauranteResumo(cliente.getRestauranteId()));
+		
+		return clienteDTO;
+	}
+
+	public ClienteDTO alterar(Long id, Cliente cliente) {
+		
+		Restaurante restaurante = restauranteService.ObterRestauranteComValidacao(cliente.getRestauranteId());
+
+		Cliente clienteAtual = this.obterClientePorId(id);
+
+		if (clienteAtual != null) {
+			cliente.setUuid(clienteAtual.getUuid());
+			BeanUtils.copyProperties(cliente, clienteAtual, "id");
+
+			clienteAtual = clienteRepository.save(clienteAtual);
+			
+			ClienteDTO clienteDTO = clienteOutputMapper.mapearDTO(cliente);			
+			clienteDTO.setRestaurante(restauranteService.obterRestauranteResumo(clienteAtual.getRestauranteId()));
+			
+			return clienteDTO;
+		}
+
+		return null;
+	}
+
+	public boolean deletar(Long id) {
+
+		Cliente cliente = this.obterClientePorId(id);
+
+		if (cliente != null) {
+
+			try {
+				clienteRepository.delete(cliente);
+				return true;
+			} catch (EmptyResultDataAccessException ex) {
+				System.out.println(ex.getMessage());
+			}
+
+		}
+
+		return false;
+	}
+	
+	public List<Cliente> obterClientesPorIdRestaurante(Long id) {
+		return clienteRepository.findByRestaurante(id);
+	}
+	
+	public ClienteDTO obterClienteDTOporId(Long id) {
+		Optional<Cliente> cliente = clienteRepository.findById(id);
+		
+		if(!cliente.isPresent()) {
+			throw new NotFoundException("cliente não encontrado");
+		}
+		
+		return obterClienteDTO(cliente.get());
+	}
+	
+	public List<ClienteDTO> obterClienteDTOs() {
+		
+		List<Cliente> clientes = clienteRepository.findAll();
+		
+		if(clientes == null) {
+			return null;
+		}
+		
+		List<ClienteDTO> clientesDTO = new ArrayList<ClienteDTO>();
+		
+		for (Cliente cliente : clientes) {			
+			
+			clientesDTO.add(obterClienteDTO(cliente));
+		}	
+		
+		return clientesDTO;
+		
+	}
+	
+	public ClienteDTO obterClienteDTO(Cliente cliente) {
+		Restaurante restaurante = restauranteService.ObterRestauranteComValidacao(cliente.getRestauranteId());		
+		cliente.setRestaurante(restaurante);		
+		ClienteDTO clienteDTO = clienteOutputMapper.mapearDTO(cliente);			
+		clienteDTO.setRestaurante(restauranteService.obterRestauranteResumo(cliente.getRestauranteId()));
+		
+		return clienteDTO;
+	}
+	
+}

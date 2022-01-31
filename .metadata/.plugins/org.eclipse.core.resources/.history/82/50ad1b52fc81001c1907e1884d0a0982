@@ -1,0 +1,92 @@
+package com.utfpr.delivery.controller;
+
+import java.util.List;
+
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.utfpr.delivery.dto.PedidoDTO;
+import com.utfpr.delivery.entity.Pedido;
+import com.utfpr.delivery.mapper.pedido.PedidoDTOMapper;
+import com.utfpr.delivery.service.PedidoService;
+
+@RestController
+@RequestMapping("/pedidos")
+public class PedidoController {
+	
+	@Autowired
+	private PedidoService pedidoService;	
+	
+	@Autowired
+	private PedidoDTOMapper pedidoOutputMapper;
+	@Autowired
+	private PedidoItemDTOMapper pedidoOutputMapper;
+	
+
+	@GetMapping
+	@ResponseBody
+	public List<PedidoDTO> obterPedidos() {	
+		
+		return pedidoOutputMapper.mapearLista(pedidoService.listar());		 
+	}
+
+	@GetMapping("/{uuid}")
+	@ResponseBody
+	public PedidoDTO obterPedidoPorId(@PathVariable String uuid) {
+
+		Pedido pedido = pedidoService.obterPedidoPorUuid(uuid);
+		
+		PedidoDTO pedidoDTO = pedidoOutputMapper.mapearDTO(pedido);
+		
+		pedidoDTO.setPedidoItems(null)
+		
+		return pedidoDTO;
+	}
+
+	@PostMapping
+	@ResponseStatus(code = HttpStatus.CREATED)
+	private PedidoDTO adicionar(@RequestBody @Valid Pedido pedido) {		
+		
+		
+		pedido = pedidoService.salvar(pedido);
+		
+		PedidoDTO pedidoDTO = pedidoOutputMapper.mapearDTO(pedido);
+		
+		return pedidoDTO;
+
+	}
+
+	@PutMapping("/{uuid}")
+	@ResponseStatus(code = HttpStatus.OK)
+	private PedidoDTO alterar(@PathVariable String uuid, @RequestBody Pedido pedido) {
+
+		pedido = pedidoService.alterar(uuid, pedido);
+		
+		PedidoDTO pedidoDTO = pedidoOutputMapper.mapearDTO(pedido);
+		
+		return pedidoDTO;
+	}
+
+	@DeleteMapping("/{id}")
+	private ResponseEntity<Pedido> deletar(@PathVariable String uuid) {
+
+		if (pedidoService.deletar(uuid)) {
+			return ResponseEntity.noContent().build();
+		}
+
+		return ResponseEntity.badRequest().build();
+	}
+}
