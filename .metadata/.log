@@ -13186,3 +13186,78 @@ java.lang.InterruptedException
 
 !ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:50:24.525
 !MESSAGE ClasspathListenerHandler removeClasspathListener sts4.classpath.qvdPILia => OK
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:17.046
+!MESSAGE Entering DelegatingStreamConnectionProvider()
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:17.047
+!MESSAGE DelegatingStreamConnectionProvider classloader = org.eclipse.osgi.internal.loader.EquinoxClassLoader@779cedb1[org.springframework.tooling.boot.ls:1.28.0.202109130547(id=562)]
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:17.047
+!MESSAGE SpringBootLanguageServer exists!
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:19.114
+!MESSAGE Boot LS startup time from start to initialized: 2066ms
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:19.220
+!MESSAGE ClasspathListenerHandler addClasspathListener sts4.classpath.jjjPDLUGisBatched = true
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:19.221
+!MESSAGE Setting up ClasspathListenerManager
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:19.222
+!MESSAGE Scheduling initial event for all projects ...
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:19.222
+!MESSAGE Scheduling initial event for all projects DONE
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:19.223
+!MESSAGE exists = true open = true => deleted = false
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:19.223
+!MESSAGE ClasspathListenerHandler addClasspathListener sts4.classpath.jjjPDLUG => OK
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:19.229
+!MESSAGE classpath=127 entries
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:19.234
+!MESSAGE buffering callback sts4.classpath.jjjPDLUG delivery false 127
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:19.235
+!MESSAGE executing callback sts4.classpath.jjjPDLUG 1 batched events
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:19.599
+!MESSAGE executing callback sts4.classpath.jjjPDLUG SUCCESS [done]
+
+!ENTRY org.eclipse.jface 2 0 2022-01-30 23:56:26.936
+!MESSAGE Keybinding conflicts occurred.  They may interfere with normal accelerator operation.
+!SUBENTRY 1 org.eclipse.jface 2 0 2022-01-30 23:56:26.936
+!MESSAGE A conflict occurred for CTRL+SHIFT+C:
+Binding(CTRL+SHIFT+C,
+	ParameterizedCommand(Command(org.eclipse.tm4e.languageconfiguration.togglelinecommentcommand,Toggle Line Comment,
+		,
+		Category(org.eclipse.tm4e.languageconfiguration.category,TM4E Language Configuration,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@56309804,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.textEditorScope,,,system)
+Binding(CTRL+SHIFT+C,
+	ParameterizedCommand(Command(org.springframework.tooling.boot.ls.ToggleComment,Toggle Comment,
+		,
+		Category(org.springframework.ide.eclipse.commands,Spring Generic Text Editor,Spring Language Server Commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@684c6c3,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.textEditorScope,,,system)
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:51.272
+!MESSAGE ClasspathListenerHandler removeClasspathListener sts4.classpath.jjjPDLUG
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:51.273
+!MESSAGE unsubscribing from classpath changes: sts4.classpath.jjjPDLUG
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:51.274
+!MESSAGE subsribers = {}
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2022-01-30 23:56:51.274
+!MESSAGE ClasspathListenerHandler removeClasspathListener sts4.classpath.jjjPDLUG => OK
